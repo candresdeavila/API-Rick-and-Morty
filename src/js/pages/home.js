@@ -20,7 +20,8 @@ export async function initHome() {
       <character-card
         name="${c.name}"
         species="${c.species}"
-        image="${c.image}">
+        image="${c.image}"
+        id="${c.id}">
       </character-card>
     `).join("");
 
