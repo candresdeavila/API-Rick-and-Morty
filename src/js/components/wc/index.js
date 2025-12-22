@@ -1,3 +1,3 @@
-import { CharacterCard } from "./character-card.js";
+import "./character-card.js";
+import "./character-detail.js";
 
-customElements.define("character-card", CharacterCard);

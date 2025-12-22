@@ -8,6 +8,7 @@ export class CharacterCard extends HTMLElement {
     const name = this.getAttribute("name");
     const species = this.getAttribute("species");
     const image = this.getAttribute("image");
+    const id = this.getAttribute("id"); 
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -17,6 +18,7 @@ export class CharacterCard extends HTMLElement {
           border-radius: 0.75rem;
           box-shadow: 0 4px 8px rgb(0 0 0 / 0.3);
           transition: transform 0.2s;
+          cursor: pointer;
         }
         .card:hover {
           transform: scale(1.05);
@@ -44,5 +46,18 @@ export class CharacterCard extends HTMLElement {
         <p>${species}</p>
       </div>
     `;
+
+    // Click event to dispatch custom event with character id
+    this.shadowRoot.querySelector(".card")
+      .addEventListener("click", () => {
+        this.dispatchEvent(
+          new CustomEvent("character-selected", {
+            detail: id,
+            bubbles: true,
+          })
+        );
+      });
   }
 }
+
+customElements.define("character-card", CharacterCard);
