@@ -1,6 +1,9 @@
 import { getCharacters } from "../api/rickApi.js";
 
-let allCharacters = []; // characters in memory
+const CHARACTERS_KEY = "rm-characters";
+const STATUS_KEY = "rm-status";
+
+let allCharacters = [];
 
 export async function initHome() {
   const app = document.querySelector("#app");
@@ -21,21 +24,31 @@ export async function initHome() {
   const statusFilter = document.querySelector("status-filter");
 
   try {
-    const { results } = await getCharacters();
-    allCharacters = results;
+    // 🔹 1. Cargar personajes desde localStorage o API
+    const storedCharacters = localStorage.getItem(CHARACTERS_KEY);
 
-    renderCharacters(allCharacters);
+    if (storedCharacters) {
+      allCharacters = JSON.parse(storedCharacters);
+    } else {
+      const { results } = await getCharacters();
+      allCharacters = results;
+      localStorage.setItem(CHARACTERS_KEY, JSON.stringify(allCharacters));
+    }
 
-    //  Listen filter changes
+    // 🔹 2. Cargar status guardado
+    const savedStatus = localStorage.getItem(STATUS_KEY) || "all";
+
+    // Decirle al componente cuál es el activo
+    statusFilter.setAttribute("active", savedStatus);
+
+    // 🔹 3. Render inicial según status
+    applyFilter(savedStatus);
+
+    // 🔹 4. Escuchar cambios del filtro
     statusFilter.addEventListener("status-change", (e) => {
       const status = e.detail;
-
-      if (status === "all") {
-        renderCharacters(allCharacters);
-      } else {
-        const filtered = allCharacters.filter(c => c.status.toLowerCase() === status);
-        renderCharacters(filtered);
-      }
+      localStorage.setItem(STATUS_KEY, status);
+      applyFilter(status);
     });
 
   } catch (error) {
@@ -44,7 +57,18 @@ export async function initHome() {
   }
 }
 
-// 🔹 función reutilizable para renderizar
+function applyFilter(status) {
+  if (status === "all") {
+    renderCharacters(allCharacters);
+  } else {
+    const filtered = allCharacters.filter(
+      c => c.status.toLowerCase() === status
+    );
+    renderCharacters(filtered);
+  }
+}
+
+// 🔹 función reutilizable
 function renderCharacters(characters) {
   const charactersContainer = document.querySelector("#characters");
 
