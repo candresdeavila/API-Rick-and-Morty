@@ -6,6 +6,17 @@ export class StatusFilter extends HTMLElement {
     this.active = "all";
   }
 
+  static get observedAttributes() {
+    return ["active"];
+  }
+
+  attributeChangedCallback(name, oldValue, newValue) {
+    if (name === "active") {
+      this.active = newValue;
+      this.render();
+    }
+  }
+
   connectedCallback() {
     this.render();
     this.addEvents();
